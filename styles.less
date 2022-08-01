@@ -1,0 +1,31 @@
+html,body {
+    font-family: Arial;
+  }
+  .main {
+    display:flex;
+    gap: 10px;
+  }
+  .img_container{
+    position:relative;
+      width:700px;
+    * {
+      position:absolute;
+      width:100%;
+    }
+  }
+  .option_container {
+    border: 1px solid #ccc;
+    border-radius:10px;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    label {
+      display:flex;
+      gap:5px;
+      select {
+        flex: 1;
+        font-size:100%;
+      }
+    }
+}
