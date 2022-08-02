@@ -35,8 +35,11 @@ var option_map = {
 	"Flowers 2 Colour": 		{url:"./images/R51_1024x1024_2_0000_Layer-3.png", default:"orange"},
 };
 
+function capitalize(s) {
+	return s.trim().toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
+}
 
-const $ = (html)=>{
+function $(html){
 	var e = document.createElement('div');
 	e.innerHTML = html;
 	return [...e.childNodes];
@@ -44,10 +47,6 @@ const $ = (html)=>{
 
 // RENDERER
 (async()=>{
-
-	function capitalize(s) {
-		return s.trim().toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
-	}
 
 	var img_container = document.querySelector(".img_container");
 	var option_container = document.querySelector(".option_container");
@@ -67,6 +66,7 @@ const $ = (html)=>{
 		})
 	}
 	
+	/** @type {Object<string,HTMLImageElement}> */
 	var images = {};
 	var loading = Promise.all([base_url, ...Object.values(option_map).map(({url})=>url)].map((url)=>{
 		return new Promise((resolve)=>{
@@ -77,6 +77,7 @@ const $ = (html)=>{
 			images[url] = img;
 		});
 	}));
+
 	await loading;
 
 	/** @type {HTMLCanvasElement} */
@@ -84,13 +85,13 @@ const $ = (html)=>{
 	canvas.width = images[base_url].width;
 	canvas.height = images[base_url].height;
 	
-	var buffer = canvas.cloneNode(true);
+	var buffer = canvas.cloneNode();
 	var buffer_ctx = buffer.getContext('2d');
 
 	async function render() {
 		await loading;
 		var old_canvas = canvas;
-		canvas = canvas.cloneNode(true);
+		canvas = canvas.cloneNode();
 		img_container.append(canvas);
 		var ctx = canvas.getContext('2d');
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -105,12 +106,10 @@ const $ = (html)=>{
 			buffer_ctx.fillRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(buffer, 0, 0);
 		}
-		if (old_canvas) {
-			canvas.addEventListener('animationend', ()=>old_canvas.remove());
-			setTimeout(()=>{
-				old_canvas.remove(); // backup
-			}, 1000);
-		}
+		canvas.addEventListener('animationend', ()=>old_canvas.remove());
+		setTimeout(()=>{
+			old_canvas.remove(); // backup
+		}, 1000);
 	}
 	render();
 })();
